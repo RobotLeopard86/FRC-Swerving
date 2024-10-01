@@ -28,4 +28,8 @@
   "java.test.defaultConfig": "WPIlibUnitTests",
   "editor.defaultFormatter": "richardwillis.vscode-spotless-gradle",
   "editor.formatOnSave": true,
+  "cSpell.words": [
+    "Brushless",
+    "cancoder"
+  ],
 }

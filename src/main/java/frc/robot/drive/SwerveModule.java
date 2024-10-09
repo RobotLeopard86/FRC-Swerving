@@ -1,11 +1,14 @@
 package frc.robot.drive;
 
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.EncoderType;
-import com.revrobotics.CANSparkBase.ControlType;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.drive.DriveConstants.SwerveModuleConfig;
 
@@ -15,7 +18,9 @@ public class SwerveModule {
 
     private SwerveModuleState state;
 
-    public SwerveModule(int rotateDev, int driveDev, int cancoderID) {
+    private Translation2d distFromCtr;
+
+    public SwerveModule(int rotateDev, int driveDev, int cancoderID, Translation2d dfc) {
         drive = new CANSparkMax(driveDev, MotorType.kBrushless);
         rotate = new CANSparkMax(rotateDev, MotorType.kBrushless);
         state = new SwerveModuleState();
@@ -32,32 +37,39 @@ public class SwerveModule {
         rotate.getPIDController().setP(DriveConstants.rotatePid.p());
         rotate.getPIDController().setI(DriveConstants.rotatePid.i());
         rotate.getPIDController().setD(DriveConstants.rotatePid.d());
+        distFromCtr = dfc;
+        drive.setIdleMode(IdleMode.kBrake);
     }
 
     public SwerveModule(SwerveModuleConfig cfg) {
-        this(cfg.rotateDevID(), cfg.driveDevID(), cfg.cancoderID());
+        this(cfg.rotateDevID(), cfg.driveDevID(), cfg.cancoderID(), cfg.dfc());
     }
 
-    CANSparkMax getRotateMotor() {
-        return rotate;
+    Translation2d getDistanceFromCenter() {
+        return distFromCtr;
     }
 
-    CANSparkMax getDriveMotor() {
-        return drive;
-    }
-
-    CANcoder getCancoder() {
-        return cancoder;
-    }
-
-    void setState(SwerveModuleState newState) {
+    void setTargetState(SwerveModuleState newState) {
         state = newState;
         rotate.getPIDController().setReference(state.angle.getRotations(), ControlType.kPosition);
         drive.getPIDController().setReference(state.speedMetersPerSecond, ControlType.kVelocity);
     }
 
-    SwerveModuleState getState() {
+    SwerveModuleState getTargetState() {
         return state;
+    }
+
+    SwerveModuleState getCurrentState() {
+       return new SwerveModuleState(drive.getEncoder().getVelocity(), new Rotation2d(rotate.getEncoder().getPosition()));
+    }
+
+    SwerveModulePosition getPosition() {
+        return new SwerveModulePosition(DriveConstants.wheelCircumference * drive.getEncoder().getPosition(), new Rotation2d(rotate.getEncoder().getPosition()));
+    }
+
+    void stop() {
+        drive.stopMotor();
+        rotate.stopMotor();
     }
 
 }

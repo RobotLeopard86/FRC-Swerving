@@ -1,6 +1,5 @@
 package frc.robot.drive.commands;
 
-import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -18,6 +17,7 @@ public class AutonomousCommand extends Command {
         xc = new PIDController(0, 0, 0);
         yc = new PIDController(0, 0, 0);
         tc = new PIDController(0, 0, 0);
+        this.addRequirements(drive);
     }
 
     @Override

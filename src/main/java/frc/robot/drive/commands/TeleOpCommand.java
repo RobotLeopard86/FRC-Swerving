@@ -13,6 +13,7 @@ public class TeleOpCommand extends Command {
     public TeleOpCommand(CommandXboxController controller, SwerveDrive drive) {
         xbox = controller;
         this.drive = drive;
+        this.addRequirements(drive);
     }
 
     @Override

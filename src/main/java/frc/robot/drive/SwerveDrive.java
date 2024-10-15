@@ -1,10 +1,11 @@
 package frc.robot.drive;
 
-import com.kauailabs.navx.frc.AHRS;
+import com.ctre.phoenix6.hardware.Pigeon2;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics.SwerveDriveWheelStates;
@@ -13,15 +14,16 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.function.Supplier;
 
 public class SwerveDrive extends SubsystemBase {
     private SwerveModule fl, fr, bl, br;
 
     private SwerveDrivePoseEstimator pe;
     private SwerveDriveKinematics kinematics;
-    private AHRS ahrs;
+    private Pigeon2 pigeon;
+    private Supplier<Double> pigeonYawSupplier;
 
     private Pose2d pose;
 
@@ -31,17 +33,18 @@ public class SwerveDrive extends SubsystemBase {
         bl = new SwerveModule(DriveConstants.backLeft);
         br = new SwerveModule(DriveConstants.backRight);
         pose = initialPose;
-        ahrs = new AHRS(Port.kMXP);
+        pigeon = new Pigeon2(DriveConstants.pigeon2ID);
+        pigeonYawSupplier = pigeon.getYaw().asSupplier();
         kinematics = new SwerveDriveKinematics(fl.getDistanceFromCenter(), fr.getDistanceFromCenter(), bl.getDistanceFromCenter(), br.getDistanceFromCenter());
         SwerveModulePosition[] positions = {fl.getPosition(), fr.getPosition(), bl.getPosition(), br.getPosition()};
-        pe = new SwerveDrivePoseEstimator(kinematics, ahrs.getRotation2d(), positions, pose);
+        pe = new SwerveDrivePoseEstimator(kinematics, Rotation2d.fromRotations(pigeonYawSupplier.get()), positions, pose);
     }
 
     @Override
     public void periodic() {
         super.periodic();
         SwerveModulePosition[] positions = {fl.getPosition(), fr.getPosition(), bl.getPosition(), br.getPosition()};
-        pose = pe.update(ahrs.getRotation2d(), positions);
+        pose = pe.update(Rotation2d.fromRotations(pigeonYawSupplier.get()), positions);
     }
 
     public Pose2d getPose() {
@@ -51,11 +54,11 @@ public class SwerveDrive extends SubsystemBase {
     public void resetPose(Pose2d newPose) {
         pose = newPose;
         SwerveModulePosition[] positions = {fl.getPosition(), fr.getPosition(), bl.getPosition(), br.getPosition()};
-        pe.resetPosition(ahrs.getRotation2d(), positions, pose);
+        pe.resetPosition(Rotation2d.fromRotations(pigeonYawSupplier.get()), positions, pose);
     }
 
     public void zeroGyro() {
-        ahrs.reset();
+        pigeon.reset();
     }
     
     public void addVisionMeasurement(Pose2d visionPose, double timestamp, Matrix<N3, N1> standardDeviations) {

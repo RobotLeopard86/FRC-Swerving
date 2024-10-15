@@ -19,6 +19,7 @@ public class RobotContainer {
 	public RobotContainer() {
 		configureBindings();
 		sd = new SwerveDrive(new Pose2d());
+		sd.setDefaultCommand(getTeleOpCommand());
 	}
 
 	private void configureBindings() {}

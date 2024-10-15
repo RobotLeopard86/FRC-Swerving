@@ -1,6 +1,10 @@
 package frc.robot.drive;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -10,6 +14,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.drive.DriveConstants.SwerveModuleConfig;
 
 public class SwerveModule {
@@ -20,7 +25,7 @@ public class SwerveModule {
 
     private Translation2d distFromCtr;
 
-    public SwerveModule(int rotateDev, int driveDev, int cancoderID, Translation2d dfc) {
+    public SwerveModule(int rotateDev, int driveDev, int cancoderID, Translation2d dfc, Rotation2d encoderOffset) {
         drive = new CANSparkMax(driveDev, MotorType.kBrushless);
         rotate = new CANSparkMax(rotateDev, MotorType.kBrushless);
         state = new SwerveModuleState();
@@ -30,6 +35,7 @@ public class SwerveModule {
         drive.getPIDController().setD(DriveConstants.drivePid.d());
         rotate.getEncoder().setPositionConversionFactor(1 / DriveConstants.rotateGR);
         cancoder = new CANcoder(cancoderID);
+        cancoder.getConfigurator().apply(new CANcoderConfiguration().withMagnetSensor(new MagnetSensorConfigs().withSensorDirection(SensorDirectionValue.CounterClockwise_Positive).withAbsoluteSensorRange(AbsoluteSensorRangeValue.Unsigned_0To1).withMagnetOffset(encoderOffset.getRotations())));
         rotate.getEncoder().setPosition(cancoder.getPosition().getValueAsDouble());
         rotate.getPIDController().setPositionPIDWrappingEnabled(true);
         rotate.getPIDController().setPositionPIDWrappingMaxInput(1);
@@ -38,11 +44,14 @@ public class SwerveModule {
         rotate.getPIDController().setI(DriveConstants.rotatePid.i());
         rotate.getPIDController().setD(DriveConstants.rotatePid.d());
         distFromCtr = dfc;
+        drive.restoreFactoryDefaults();
         drive.setIdleMode(IdleMode.kBrake);
+        rotate.restoreFactoryDefaults();
+        rotate.setIdleMode(IdleMode.kBrake);
     }
 
     public SwerveModule(SwerveModuleConfig cfg) {
-        this(cfg.rotateDevID(), cfg.driveDevID(), cfg.cancoderID(), cfg.dfc());
+        this(cfg.rotateDevID(), cfg.driveDevID(), cfg.cancoderID(), cfg.dfc(), cfg.encoderOffset());
     }
 
     Translation2d getDistanceFromCenter() {
@@ -53,6 +62,8 @@ public class SwerveModule {
         state = newState;
         rotate.getPIDController().setReference(state.angle.getRotations(), ControlType.kPosition);
         drive.getPIDController().setReference(state.speedMetersPerSecond, ControlType.kVelocity);
+        SmartDashboard.putNumber("rotate", state.angle.getRotations());
+        SmartDashboard.putNumber("drive", state.speedMetersPerSecond);
     }
 
     SwerveModuleState getTargetState() {

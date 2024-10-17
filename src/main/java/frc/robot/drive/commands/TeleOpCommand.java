@@ -7,8 +7,8 @@ import frc.robot.drive.SwerveDrive;
 
 public class TeleOpCommand extends Command {
 
-    CommandXboxController xbox;
-    SwerveDrive drive;
+    private CommandXboxController xbox;
+    private SwerveDrive drive;
 
     public TeleOpCommand(CommandXboxController controller, SwerveDrive drive) {
         xbox = controller;

@@ -9,17 +9,21 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.arm.ArmCommand;
+import frc.robot.arm.ArmSystem;
 import frc.robot.drive.SwerveDrive;
 import frc.robot.drive.commands.AutonomousCommand;
 import frc.robot.drive.commands.TeleOpCommand;
 
 public class RobotContainer {
 	private SwerveDrive sd;
+	private ArmSystem arm;
 
 	public RobotContainer() {
 		configureBindings();
 		sd = new SwerveDrive(new Pose2d());
 		sd.setDefaultCommand(getTeleOpCommand());
+		arm = new ArmSystem();
 	}
 
 	private void configureBindings() {}
@@ -30,5 +34,9 @@ public class RobotContainer {
 
 	public Command getTeleOpCommand() {
 		return new TeleOpCommand(new CommandXboxController(RobotConstants.controllerPort), sd);
+	}
+
+	public Command getArmCommand() {
+		return new ArmCommand(new CommandXboxController(RobotConstants.controllerPort), arm);
 	}
 }

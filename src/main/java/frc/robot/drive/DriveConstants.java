@@ -10,8 +10,8 @@ public class DriveConstants {
     public record SwerveModuleConfig(int driveDevID, int rotateDevID, int cancoderID, Translation2d dfc, Rotation2d encoderOffset) {}
     public record PID(double p, double i, double d) {}
 
-    public static final double driveGR = 8.14;
-    public static final double rotateGR = 12.8;
+    public static final double driveReduction = (50.0 / 14.0) * (19.0 / 25.0) * (45.0 / 15.0);
+    public static final double rotateReduction = (12.8 / 1.0);
 
     public static final int pigeon2ID = 40;
 

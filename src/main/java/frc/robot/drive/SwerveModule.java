@@ -29,11 +29,13 @@ public class SwerveModule {
         drive = new CANSparkMax(driveDev, MotorType.kBrushless);
         rotate = new CANSparkMax(rotateDev, MotorType.kBrushless);
         state = new SwerveModuleState();
-        drive.getEncoder().setPositionConversionFactor(1 / DriveConstants.driveGR);
+        drive.getEncoder().setPositionConversionFactor(1 / DriveConstants.driveReduction);
+        drive.getEncoder().setVelocityConversionFactor(1 / DriveConstants.driveReduction);
         drive.getPIDController().setP(DriveConstants.drivePid.p());
         drive.getPIDController().setI(DriveConstants.drivePid.i());
         drive.getPIDController().setD(DriveConstants.drivePid.d());
-        rotate.getEncoder().setPositionConversionFactor(1 / DriveConstants.rotateGR);
+        rotate.getEncoder().setPositionConversionFactor(1 / DriveConstants.rotateReduction);
+        rotate.getEncoder().setVelocityConversionFactor(1 / DriveConstants.rotateReduction);
         cancoder = new CANcoder(cancoderID);
         cancoder.getConfigurator().apply(new CANcoderConfiguration().withMagnetSensor(new MagnetSensorConfigs().withSensorDirection(SensorDirectionValue.CounterClockwise_Positive).withAbsoluteSensorRange(AbsoluteSensorRangeValue.Unsigned_0To1).withMagnetOffset(encoderOffset.getRotations())));
         rotate.getEncoder().setPosition(cancoder.getPosition().getValueAsDouble());
@@ -60,8 +62,8 @@ public class SwerveModule {
 
     void setTargetState(SwerveModuleState newState) {
         state = newState;
-        rotate.getPIDController().setReference(state.angle.getRotations(), ControlType.kPosition);
-        drive.getPIDController().setReference(state.speedMetersPerSecond, ControlType.kVelocity);
+        rotate.getPIDController().setReference(state.angle.getRotations(), ControlType.kPosition, 0);
+        drive.getPIDController().setReference(state.speedMetersPerSecond, ControlType.kVelocity, 0);
         SmartDashboard.putNumber("rotate", state.angle.getRotations());
         SmartDashboard.putNumber("drive", state.speedMetersPerSecond);
     }

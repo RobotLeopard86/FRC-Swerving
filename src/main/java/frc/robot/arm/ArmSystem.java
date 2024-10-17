@@ -23,11 +23,11 @@ public class ArmSystem extends SubsystemBase {
     }
 
     public Rotation2d getCurrentAngle() {
-        return Rotation2d.fromRotations(left.getEncoder().getPosition());
+        return Rotation2d.fromRotations(cancoder.getPosition().getValueAsDouble());
     }
 
     public void setCurrentAngle(Rotation2d newPosition) {
-        left.getEncoder().setPosition(newPosition.getRotations());
+        cancoder.setPosition(newPosition.getRotations());
         SmartDashboard.putString("ARM POSITION DEGREES", String.valueOf(newPosition.getDegrees()));
     }
 }

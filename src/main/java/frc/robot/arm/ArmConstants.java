@@ -12,4 +12,5 @@ public class ArmConstants {
     public static final double armSpeakerShootDegrees = -105.822;
     public static final double armIntakeDegrees = -110.5;
     public static final double armMoveDegrees = 1.0;
+    public static final int xboxID = 0;
 }

@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.arm.ArmConstants;
 import frc.robot.arm.ArmSystem;
 
+/// Aceius: This is basically a duplicate of ArmDownCommand. See my comments there. Also, Don't Repeat Yourself.
 public class ArmUpCommand extends Command {
     private ArmSystem arm;
     private Rotation2d target;

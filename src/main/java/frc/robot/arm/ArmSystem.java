@@ -27,6 +27,8 @@ public class ArmSystem extends SubsystemBase {
     }
 
     public void setCurrentAngle(Rotation2d newPosition) {
+        /// Aceius: Thats not how motors work... You're setting the position of the encoder not the motor.
+        /// Look into PID controllers and motor.set()
         cancoder.setPosition(newPosition.getRotations());
         SmartDashboard.putString("ARM POSITION DEGREES", String.valueOf(newPosition.getDegrees()));
     }

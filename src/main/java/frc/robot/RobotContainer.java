@@ -20,6 +20,8 @@ import frc.robot.drive.commands.AutonomousCommand;
 import frc.robot.drive.commands.TeleOpCommand;
 
 public class RobotContainer {
+	/// Aceius: These names could do with some improvement.
+	/// Also: please don't abbreviate names.
 	private SwerveDrive sd;
 	private ArmSystem arm;
 	private CommandXboxController xbox;

@@ -1,6 +1,8 @@
 package frc.robot.arm;
 
+/// Aceius: This class can be static
 public class ArmConstants {
+    /// Aceius: This isn't needed
     private ArmConstants() {}
 
     public static final double maxArmDegrees = 50.0;

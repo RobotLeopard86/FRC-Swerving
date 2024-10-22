@@ -1,5 +1,7 @@
 package frc.robot.drive;
 
+import java.util.function.Supplier;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 
 import edu.wpi.first.math.Matrix;
@@ -15,7 +17,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.function.Supplier;
 
 public class SwerveDrive extends SubsystemBase {
     private SwerveModule fl, fr, bl, br;
@@ -28,12 +29,12 @@ public class SwerveDrive extends SubsystemBase {
     private Pose2d pose;
 
     public SwerveDrive(Pose2d initialPose) {
-        fl = new SwerveModule(DriveConstants.frontLeft);
-        fr = new SwerveModule(DriveConstants.frontRight);
-        bl = new SwerveModule(DriveConstants.backLeft);
-        br = new SwerveModule(DriveConstants.backRight);
+        fl = new SwerveModule(DriveConstants.FRONT_LEFT);
+        fr = new SwerveModule(DriveConstants.FRONT_RIGHT);
+        bl = new SwerveModule(DriveConstants.BACK_LEFT);
+        br = new SwerveModule(DriveConstants.BACK_RIGHT);
         pose = initialPose;
-        pigeon = new Pigeon2(DriveConstants.pigeon2ID);
+        pigeon = new Pigeon2(DriveConstants.PIGEON2_ID);
         pigeonYawSupplier = pigeon.getYaw().asSupplier();
         kinematics = new SwerveDriveKinematics(fl.getDistanceFromCenter(), fr.getDistanceFromCenter(), bl.getDistanceFromCenter(), br.getDistanceFromCenter());
         SwerveModulePosition[] positions = {fl.getPosition(), fr.getPosition(), bl.getPosition(), br.getPosition()};
@@ -108,6 +109,6 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public double getMaxAngularSpeedRadsPerSecond() {
-        return getMaxLinearSpeedMetersPerSecond() / DriveConstants.botWidth;
+        return getMaxLinearSpeedMetersPerSecond() / DriveConstants.BOT_WIDTH;
     }
 }

@@ -29,22 +29,22 @@ public class SwerveModule {
         drive = new CANSparkMax(driveDev, MotorType.kBrushless);
         rotate = new CANSparkMax(rotateDev, MotorType.kBrushless);
         state = new SwerveModuleState();
-        drive.getEncoder().setPositionConversionFactor(1 / DriveConstants.driveReduction);
-        drive.getEncoder().setVelocityConversionFactor(1 / DriveConstants.driveReduction);
-        drive.getPIDController().setP(DriveConstants.drivePid.p());
-        drive.getPIDController().setI(DriveConstants.drivePid.i());
-        drive.getPIDController().setD(DriveConstants.drivePid.d());
-        rotate.getEncoder().setPositionConversionFactor(1 / DriveConstants.rotateReduction);
-        rotate.getEncoder().setVelocityConversionFactor(1 / DriveConstants.rotateReduction);
+        drive.getEncoder().setPositionConversionFactor(1 / DriveConstants.DRIVE_REDUCTION);
+        drive.getEncoder().setVelocityConversionFactor(1 / DriveConstants.DRIVE_REDUCTION);
+        drive.getPIDController().setP(DriveConstants.DRIVE_PID.p());
+        drive.getPIDController().setI(DriveConstants.DRIVE_PID.i());
+        drive.getPIDController().setD(DriveConstants.DRIVE_PID.d());
+        rotate.getEncoder().setPositionConversionFactor(1 / DriveConstants.ROTATE_REDUCTION);
+        rotate.getEncoder().setVelocityConversionFactor(1 / DriveConstants.ROTATE_REDUCTION);
         cancoder = new CANcoder(cancoderID);
         cancoder.getConfigurator().apply(new CANcoderConfiguration().withMagnetSensor(new MagnetSensorConfigs().withSensorDirection(SensorDirectionValue.CounterClockwise_Positive).withAbsoluteSensorRange(AbsoluteSensorRangeValue.Unsigned_0To1).withMagnetOffset(encoderOffset.getRotations())));
         rotate.getEncoder().setPosition(cancoder.getPosition().getValueAsDouble());
         rotate.getPIDController().setPositionPIDWrappingEnabled(true);
         rotate.getPIDController().setPositionPIDWrappingMaxInput(1);
         rotate.getPIDController().setPositionPIDWrappingMinInput(0);
-        rotate.getPIDController().setP(DriveConstants.rotatePid.p());
-        rotate.getPIDController().setI(DriveConstants.rotatePid.i());
-        rotate.getPIDController().setD(DriveConstants.rotatePid.d());
+        rotate.getPIDController().setP(DriveConstants.ROTATE_PID.p());
+        rotate.getPIDController().setI(DriveConstants.ROTATE_PID.i());
+        rotate.getPIDController().setD(DriveConstants.ROTATE_PID.d());
         distFromCtr = dfc;
         drive.restoreFactoryDefaults();
         drive.setIdleMode(IdleMode.kBrake);
@@ -77,7 +77,7 @@ public class SwerveModule {
     }
 
     SwerveModulePosition getPosition() {
-        return new SwerveModulePosition(DriveConstants.wheelCircumference * drive.getEncoder().getPosition(), new Rotation2d(rotate.getEncoder().getPosition()));
+        return new SwerveModulePosition(DriveConstants.WHEEL_CIRCUMFERENCE * drive.getEncoder().getPosition(), new Rotation2d(rotate.getEncoder().getPosition()));
     }
 
     void stop() {

@@ -19,17 +19,20 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveDrive extends SubsystemBase {
+    // Aceius: I suppose the abbreviation make sense here but I would personally not
     private SwerveModule fl, fr, bl, br;
 
+    // Aceius: NAMES!!!!
     private SwerveDrivePoseEstimator pe;
     private SwerveDriveKinematics kinematics;
-    private Pigeon2 pigeon;
-    private Supplier<Double> pigeonYawSupplier;
+    private Pigeon2 pigeon; // Aceius: Name this Gyro. We change gyro manufacturers every so often
+    private Supplier<Double> pigeonYawSupplier; // Aceius: See above
 
     private Pose2d pose;
 
+    // Aceius: Whitespace!!!
     public SwerveDrive(Pose2d initialPose) {
-        fl = new SwerveModule(DriveConstants.FRONT_LEFT);
+        fl = new SwerveModule(DriveConstants.FRONT_LEFT); // Aceius: Better name: FRONT_LEFT_CONFIG. I had to think about what that variuble held and couldn't figure it out without re enabling intellisense
         fr = new SwerveModule(DriveConstants.FRONT_RIGHT);
         bl = new SwerveModule(DriveConstants.BACK_LEFT);
         br = new SwerveModule(DriveConstants.BACK_RIGHT);
@@ -45,6 +48,7 @@ public class SwerveDrive extends SubsystemBase {
     public void periodic() {
         super.periodic();
         SwerveModulePosition[] positions = {fl.getPosition(), fr.getPosition(), bl.getPosition(), br.getPosition()};
+        // Aceius: I was confused reading this. What is being updated? PE could be anything, I thought it was a PID controller for a second untill I read what it was upstairs.
         pose = pe.update(Rotation2d.fromRotations(pigeonYawSupplier.get()), positions);
     }
 
@@ -111,4 +115,6 @@ public class SwerveDrive extends SubsystemBase {
     public double getMaxAngularSpeedRadsPerSecond() {
         return getMaxLinearSpeedMetersPerSecond() / DriveConstants.BOT_WIDTH;
     }
+
+    // Aceius: TODO: Add field relative
 }

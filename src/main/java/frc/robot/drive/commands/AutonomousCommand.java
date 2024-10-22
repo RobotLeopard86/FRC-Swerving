@@ -9,6 +9,7 @@ import frc.robot.drive.SwerveDrive;
 public class AutonomousCommand extends Command {
     SwerveDrive drive;
     Pose2d target;
+    // Aceius: NAMES!!!!!
     PIDController xc, yc, tc;
 
     public AutonomousCommand(SwerveDrive drive, Pose2d targetPose) {
@@ -17,9 +18,10 @@ public class AutonomousCommand extends Command {
         xc = new PIDController(0, 0, 0);
         yc = new PIDController(0, 0, 0);
         tc = new PIDController(0, 0, 0);
-        this.addRequirements(drive);
+        this.addRequirements(drive); // Aceius: Nitpick: "this." isnt needed
     }
 
+    // Aceius: Super.Blah uneeded 
     @Override
     public void end(boolean interrupted) {
         drive.stop();

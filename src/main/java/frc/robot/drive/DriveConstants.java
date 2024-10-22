@@ -5,6 +5,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Utils.PID;
 
+// Aceius: This could just be a nested class of RobotConstants.java
+// Then it could also be static and final
 public class DriveConstants {
     private DriveConstants() {}
 

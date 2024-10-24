@@ -9,34 +9,34 @@ import frc.robot.drive.SwerveDrive;
 public class AutonomousCommand extends Command {
     SwerveDrive drive;
     Pose2d target;
-    PIDController xc, yc, tc;
+    PIDController xPidController, yPidController, turnPidController;
 
     public AutonomousCommand(SwerveDrive drive, Pose2d targetPose) {
         this.drive = drive;
         target = targetPose;
-        xc = new PIDController(0, 0, 0);
-        yc = new PIDController(0, 0, 0);
-        tc = new PIDController(0, 0, 0);
-        this.addRequirements(drive);
+        xPidController = new PIDController(0, 0, 0);
+        yPidController = new PIDController(0, 0, 0);
+        turnPidController = new PIDController(0, 0, 0);
+        addRequirements(drive);
     }
 
     @Override
     public void end(boolean interrupted) {
         drive.stop();
-        super.end(interrupted);
     }
 
     @Override
     public void execute() {
         Pose2d curPose = drive.getPose();
-        drive.setRobotSpeeds(new ChassisSpeeds(xc.calculate(curPose.getX(), target.getX()), yc.calculate(curPose.getY(), target.getY()), tc.calculate(curPose.getRotation().getRadians(), curPose.getRotation().getRadians())));
-        super.execute();
+        drive.setRobotSpeeds(new ChassisSpeeds(
+            xPidController.calculate(curPose.getX(), target.getX()), 
+            yPidController.calculate(curPose.getY(), target.getY()), 
+            turnPidController.calculate(curPose.getRotation().getRadians(), curPose.getRotation().getRadians())
+        ));
     }
 
     @Override
-    public void initialize() {
-        super.initialize();
-    }
+    public void initialize() {}
     
     @Override
     public boolean isFinished() {

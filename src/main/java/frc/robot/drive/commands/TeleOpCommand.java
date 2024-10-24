@@ -13,25 +13,21 @@ public class TeleOpCommand extends Command {
     public TeleOpCommand(CommandXboxController controller, SwerveDrive drive) {
         xbox = controller;
         this.drive = drive;
-        this.addRequirements(drive);
+        addRequirements(drive);
     }
 
     @Override
     public void end(boolean interrupted) {
         drive.stop();
-        super.end(interrupted);
     }
 
     @Override
     public void execute() {
         drive.setRobotSpeeds(new ChassisSpeeds(-xbox.getLeftY(), -xbox.getLeftX(), -xbox.getRightX()));
-        super.execute();
     }
 
     @Override
-    public void initialize() {
-        super.initialize();
-    }
+    public void initialize() {}
     
     @Override
     public boolean isFinished() {

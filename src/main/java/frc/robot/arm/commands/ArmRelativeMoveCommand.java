@@ -25,6 +25,7 @@ public class ArmRelativeMoveCommand extends ArmToPositionCommand {
         //Now we have to clamp it... JDK 21 does this for us but we're not on 21 so *angry noises*.
         target = Rotation2d.fromDegrees(Math.min(Math.max(ArmConstants.MIN_ARM_DEGREES, target.getDegrees()), ArmConstants.MAX_ARM_DEGREES));
 
+        //Invoke arm setting logic from ArmToPositionCommand
         super.execute();
     }
 }

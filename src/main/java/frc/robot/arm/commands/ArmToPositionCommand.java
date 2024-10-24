@@ -16,14 +16,11 @@ public class ArmToPositionCommand extends Command {
     }
 
     @Override
-    public void initialize() {
-        super.initialize();
-    }
+    public void initialize() {}
 
     @Override
     public void execute() {
         arm.setCurrentAngle(target);
-        super.execute();
     }
 
     @Override
@@ -33,7 +30,5 @@ public class ArmToPositionCommand extends Command {
     }
 
     @Override
-    public void end(boolean interrupted) {
-        super.end(interrupted);
-    }
+    public void end(boolean interrupted) {}
 }

@@ -5,7 +5,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -27,7 +26,7 @@ public class SwerveDrive extends SubsystemBase {
 
     private SwerveDrivePoseEstimator poseEstimator;
     private SwerveDriveKinematics kinematics;
-    private Gyro<?> gyro;
+    private GyroIO gyro;
     private Supplier<Double> gyroYawSupplier;
 
     private Pose2d pose;
@@ -39,25 +38,11 @@ public class SwerveDrive extends SubsystemBase {
         backRight = new SwerveModule(DriveConstants.BACK_RIGHT_SWERVE_CONFIG);
         pose = initialPose;
         switch (DriveConstants.GYRO_TYPE) {
-            case NavX: {
-                Function<AHRS, Supplier<Double>> yawGet = (AHRS a) -> {
-                    return () -> a.getAngle();
-                };
-                Consumer<AHRS> reset = (AHRS a) -> {
-                    a.reset();
-                };
-                gyro = new Gyro<AHRS>(new AHRS(SerialPort.Port.kMXP), yawGet, reset);
-            }
+            case NavX:
+                gyro = new NavXGyro();
                 break;
-            case Pigeon2: {
-                Function<Pigeon2, Supplier<Double>> yawGet = (Pigeon2 p) -> {
-                    return p.getYaw().asSupplier();
-                };
-                Consumer<Pigeon2> reset = (Pigeon2 p) -> {
-                    p.reset();
-                };
-                gyro = new Gyro<Pigeon2>(new Pigeon2(DriveConstants.GYRO_ID), yawGet, reset);
-            }
+            case Pigeon2:
+                gyro = new PigeonGyro();
                 break;
         }
         gyroYawSupplier = gyro.getYawSupplier();

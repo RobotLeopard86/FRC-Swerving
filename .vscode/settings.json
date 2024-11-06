@@ -32,4 +32,7 @@
     "Brushless",
     "cancoder"
   ],
+  "[java]": {
+    "editor.defaultFormatter": "redhat.java"
+  },
 }

@@ -39,9 +39,9 @@ public class SwerveModule {
 
         driveMotor.getEncoder().setPositionConversionFactor(1 / DriveConstants.DRIVE_REDUCTION);
         driveMotor.getEncoder().setVelocityConversionFactor(1 / DriveConstants.DRIVE_REDUCTION);
-        driveMotor.getPIDController().setP(DriveConstants.DRIVE_PID.p());
-        driveMotor.getPIDController().setI(DriveConstants.DRIVE_PID.i());
-        driveMotor.getPIDController().setD(DriveConstants.DRIVE_PID.d());
+        driveMotor.getPIDController().setP(DriveConstants.DRIVE_PID.p(), 0);
+        driveMotor.getPIDController().setI(DriveConstants.DRIVE_PID.i(), 0);
+        driveMotor.getPIDController().setD(DriveConstants.DRIVE_PID.d(), 0);
 
         rotateMotor.getEncoder().setPositionConversionFactor(1 / DriveConstants.ROTATE_REDUCTION);
         rotateMotor.getEncoder().setVelocityConversionFactor(1 / DriveConstants.ROTATE_REDUCTION);
@@ -49,9 +49,9 @@ public class SwerveModule {
         rotateMotor.getPIDController().setPositionPIDWrappingEnabled(true);
         rotateMotor.getPIDController().setPositionPIDWrappingMaxInput(1);
         rotateMotor.getPIDController().setPositionPIDWrappingMinInput(0);
-        rotateMotor.getPIDController().setP(DriveConstants.ROTATE_PID.p());
-        rotateMotor.getPIDController().setI(DriveConstants.ROTATE_PID.i());
-        rotateMotor.getPIDController().setD(DriveConstants.ROTATE_PID.d());
+        rotateMotor.getPIDController().setP(DriveConstants.ROTATE_PID.p(), 0);
+        rotateMotor.getPIDController().setI(DriveConstants.ROTATE_PID.i(), 0);
+        rotateMotor.getPIDController().setD(DriveConstants.ROTATE_PID.d(), 0);
 
         distanceFromRobotCenter = cfg.distanceFromCenter();
 
@@ -69,7 +69,7 @@ public class SwerveModule {
     public void setTargetState(SwerveModuleState newState) {
         state = newState;
         rotateMotor.getPIDController().setReference(state.angle.getRotations(), ControlType.kPosition, 0);
-        driveMotor.getPIDController().setReference(state.speedMetersPerSecond, ControlType.kVelocity, 0);
+        driveMotor.getPIDController().setReference(state.speedMetersPerSecond / DriveConstants.WHEEL_CIRCUMFERENCE, ControlType.kVelocity, 0);
         SmartDashboard.putNumber("rotate", state.angle.getRotations());
         SmartDashboard.putNumber("drive", state.speedMetersPerSecond);
     }

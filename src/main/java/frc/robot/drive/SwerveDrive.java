@@ -1,8 +1,11 @@
 package frc.robot.drive;
 
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -16,6 +19,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveDrive extends SubsystemBase {
@@ -23,7 +27,7 @@ public class SwerveDrive extends SubsystemBase {
 
     private SwerveDrivePoseEstimator poseEstimator;
     private SwerveDriveKinematics kinematics;
-    private Pigeon2 gyro;
+    private Gyro<?> gyro;
     private Supplier<Double> gyroYawSupplier;
 
     private Pose2d pose;
@@ -34,17 +38,43 @@ public class SwerveDrive extends SubsystemBase {
         backLeft = new SwerveModule(DriveConstants.BACK_LEFT_SWERVE_CONFIG);
         backRight = new SwerveModule(DriveConstants.BACK_RIGHT_SWERVE_CONFIG);
         pose = initialPose;
-        gyro = new Pigeon2(DriveConstants.PIGEON2_ID);
-        gyroYawSupplier = gyro.getYaw().asSupplier();
-        kinematics = new SwerveDriveKinematics(frontLeft.getDistanceFromRobotCenter(), frontRight.getDistanceFromRobotCenter(), backLeft.getDistanceFromRobotCenter(), backRight.getDistanceFromRobotCenter());
-        SwerveModulePosition[] positions = {frontLeft.getPosition(), frontRight.getPosition(), backLeft.getPosition(), backRight.getPosition()};
-        poseEstimator = new SwerveDrivePoseEstimator(kinematics, Rotation2d.fromRotations(gyroYawSupplier.get()), positions, pose);
+        switch (DriveConstants.GYRO_TYPE) {
+            case NavX: {
+                Function<AHRS, Supplier<Double>> yawGet = (AHRS a) -> {
+                    return () -> a.getAngle();
+                };
+                Consumer<AHRS> reset = (AHRS a) -> {
+                    a.reset();
+                };
+                gyro = new Gyro<AHRS>(new AHRS(SerialPort.Port.kMXP), yawGet, reset);
+            }
+                break;
+            case Pigeon2: {
+                Function<Pigeon2, Supplier<Double>> yawGet = (Pigeon2 p) -> {
+                    return p.getYaw().asSupplier();
+                };
+                Consumer<Pigeon2> reset = (Pigeon2 p) -> {
+                    p.reset();
+                };
+                gyro = new Gyro<Pigeon2>(new Pigeon2(DriveConstants.GYRO_ID), yawGet, reset);
+            }
+                break;
+        }
+        gyroYawSupplier = gyro.getYawSupplier();
+        kinematics = new SwerveDriveKinematics(frontLeft.getDistanceFromRobotCenter(),
+                frontRight.getDistanceFromRobotCenter(), backLeft.getDistanceFromRobotCenter(),
+                backRight.getDistanceFromRobotCenter());
+        SwerveModulePosition[] positions = { frontLeft.getPosition(), frontRight.getPosition(), backLeft.getPosition(),
+                backRight.getPosition() };
+        poseEstimator = new SwerveDrivePoseEstimator(kinematics, Rotation2d.fromRotations(gyroYawSupplier.get()),
+                positions, pose);
     }
 
     @Override
     public void periodic() {
         super.periodic();
-        SwerveModulePosition[] positions = {frontLeft.getPosition(), frontRight.getPosition(), backLeft.getPosition(), backRight.getPosition()};
+        SwerveModulePosition[] positions = { frontLeft.getPosition(), frontRight.getPosition(), backLeft.getPosition(),
+                backRight.getPosition() };
         pose = poseEstimator.update(Rotation2d.fromRotations(gyroYawSupplier.get()), positions);
     }
 
@@ -54,14 +84,15 @@ public class SwerveDrive extends SubsystemBase {
 
     public void resetPose(Pose2d newPose) {
         pose = newPose;
-        SwerveModulePosition[] positions = {frontLeft.getPosition(), frontRight.getPosition(), backLeft.getPosition(), backRight.getPosition()};
+        SwerveModulePosition[] positions = { frontLeft.getPosition(), frontRight.getPosition(), backLeft.getPosition(),
+                backRight.getPosition() };
         poseEstimator.resetPosition(Rotation2d.fromRotations(gyroYawSupplier.get()), positions, pose);
     }
 
     public void zeroGyro() {
         gyro.reset();
     }
-    
+
     public void addVisionMeasurement(Pose2d visionPose, double timestamp, Matrix<N3, N1> standardDeviations) {
         poseEstimator.setVisionMeasurementStdDevs(standardDeviations);
         addVisionMeasurement(visionPose, timestamp);
@@ -72,11 +103,13 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public ChassisSpeeds getCurrentRobotSpeeds() {
-        return kinematics.toChassisSpeeds(frontLeft.getCurrentState(), frontRight.getCurrentState(), backLeft.getCurrentState(), backRight.getCurrentState());
+        return kinematics.toChassisSpeeds(frontLeft.getCurrentState(), frontRight.getCurrentState(),
+                backLeft.getCurrentState(), backRight.getCurrentState());
     }
 
     public ChassisSpeeds getTargetRobotSpeeds() {
-        return kinematics.toChassisSpeeds(frontLeft.getTargetState(), frontRight.getTargetState(), backLeft.getTargetState(), backRight.getTargetState());
+        return kinematics.toChassisSpeeds(frontLeft.getTargetState(), frontRight.getTargetState(),
+                backLeft.getTargetState(), backRight.getTargetState());
     }
 
     public void setRobotSpeeds(ChassisSpeeds speeds) {
@@ -96,7 +129,8 @@ public class SwerveDrive extends SubsystemBase {
     }
 
     public SwerveDriveWheelPositions getWheelPositions() {
-        SwerveModulePosition[] smp = {frontLeft.getPosition(), frontRight.getPosition(), backLeft.getPosition(), backRight.getPosition()};
+        SwerveModulePosition[] smp = { frontLeft.getPosition(), frontRight.getPosition(), backLeft.getPosition(),
+                backRight.getPosition() };
         return new SwerveDriveWheelPositions(smp);
     }
 

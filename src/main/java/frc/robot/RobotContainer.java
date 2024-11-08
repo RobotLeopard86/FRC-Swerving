@@ -34,9 +34,12 @@ public class RobotContainer {
 		xbox.pov(0).onTrue(new ArmRelativeMoveCommand(arm, false));
 		xbox.pov(180).onTrue(new ArmRelativeMoveCommand(arm, true));
 		xbox.b().onTrue(new ArmToPositionCommand(arm, Rotation2d.fromDegrees(ArmConstants.ARM_STOW_DEGREES)));
-		xbox.leftTrigger().onTrue(new ArmToPositionCommand(arm, Rotation2d.fromDegrees(ArmConstants.ARM_SPEAKER_SHOOT_DEGREES)));
-		xbox.rightTrigger().onTrue(new ArmToPositionCommand(arm, Rotation2d.fromDegrees(ArmConstants.ARM_INTAKE_DEGREES)));
-		xbox.leftBumper().onTrue(new ArmToPositionCommand(arm, Rotation2d.fromDegrees(ArmConstants.ARM_AMP_SHOOT_DEGREES)));
+		xbox.leftTrigger()
+				.onTrue(new ArmToPositionCommand(arm, Rotation2d.fromDegrees(ArmConstants.ARM_SPEAKER_SHOOT_DEGREES)));
+		xbox.rightTrigger()
+				.onTrue(new ArmToPositionCommand(arm, Rotation2d.fromDegrees(ArmConstants.ARM_INTAKE_DEGREES)));
+		xbox.leftBumper()
+				.onTrue(new ArmToPositionCommand(arm, Rotation2d.fromDegrees(ArmConstants.ARM_AMP_SHOOT_DEGREES)));
 	}
 
 	public Command getAutonomousCommand() {

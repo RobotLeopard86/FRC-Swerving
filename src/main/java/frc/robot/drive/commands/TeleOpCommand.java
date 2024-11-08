@@ -1,8 +1,10 @@
 package frc.robot.drive.commands;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.drive.DriveConstants;
 import frc.robot.drive.SwerveDrive;
 
 public class TeleOpCommand extends Command {
@@ -23,12 +25,17 @@ public class TeleOpCommand extends Command {
 
     @Override
     public void execute() {
-        drive.setRobotSpeeds(new ChassisSpeeds(-xbox.getLeftY(), -xbox.getLeftX(), -xbox.getRightX()));
+        ChassisSpeeds speeds = new ChassisSpeeds(
+                MathUtil.applyDeadband(-xbox.getLeftY(), DriveConstants.CONTROLLER_DEADBAND),
+                MathUtil.applyDeadband(-xbox.getLeftX(), DriveConstants.CONTROLLER_DEADBAND),
+                MathUtil.applyDeadband(-xbox.getRightX(), DriveConstants.CONTROLLER_DEADBAND));
+        drive.setRobotSpeeds(speeds);
     }
 
     @Override
-    public void initialize() {}
-    
+    public void initialize() {
+    }
+
     @Override
     public boolean isFinished() {
         return false;

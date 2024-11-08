@@ -43,13 +43,15 @@ public class ArmSystem extends SubsystemBase {
     }
 
     public void setCurrentAngle(Rotation2d newPosition) {
-        left.getPIDController().setReference(newPosition.getRotations(), ControlType.kPosition);
+        // left.getPIDController().setReference(newPosition.getRotations(),
+        // ControlType.kPosition);
         SmartDashboard.putString("ARM ANGLE TARGET DEGREES", String.valueOf(newPosition.getDegrees()));
     }
 
     @Override
     public void periodic() {
         super.periodic();
-        SmartDashboard.putString("ARM ANGLE CURRENT DEGREES", String.valueOf(Rotation2d.fromRotations(cancoder.getAbsolutePosition().getValueAsDouble()).getDegrees()));
+        SmartDashboard.putString("ARM ANGLE CURRENT DEGREES", String
+                .valueOf(Rotation2d.fromRotations(cancoder.getAbsolutePosition().getValueAsDouble()).getDegrees()));
     }
 }

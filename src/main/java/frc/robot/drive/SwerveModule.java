@@ -5,7 +5,7 @@ import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
@@ -25,17 +25,27 @@ public class SwerveModule {
 
     private Translation2d distanceFromRobotCenter;
 
-    public SwerveModule(SwerveModuleConfig cfg) {
+    private String name;
+
+    public SwerveModule(SwerveModuleConfig cfg, String name) {
         driveMotor = new CANSparkMax(cfg.driveMotorID(), MotorType.kBrushless);
         rotateMotor = new CANSparkMax(cfg.rotateMotorID(), MotorType.kBrushless);
 
         state = new SwerveModuleState();
 
+        this.name = name;
+
+        driveMotor.restoreFactoryDefaults();
+        driveMotor.setIdleMode(IdleMode.kBrake);
+
+        rotateMotor.restoreFactoryDefaults();
+        rotateMotor.setIdleMode(IdleMode.kBrake);
+
         absoluteEncoder = new CANcoder(cfg.absoluteEncoderID());
         absoluteEncoder.getConfigurator().apply(new CANcoderConfiguration().withMagnetSensor(new MagnetSensorConfigs()
-            .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
-            .withAbsoluteSensorRange(AbsoluteSensorRangeValue.Unsigned_0To1)
-            .withMagnetOffset(cfg.encoderOffset().getRotations())));
+                .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
+                .withAbsoluteSensorRange(AbsoluteSensorRangeValue.Unsigned_0To1)
+                .withMagnetOffset(cfg.encoderOffset().getRotations())));
 
         driveMotor.getEncoder().setPositionConversionFactor(1 / DriveConstants.DRIVE_REDUCTION);
         driveMotor.getEncoder().setVelocityConversionFactor(1 / DriveConstants.DRIVE_REDUCTION);
@@ -54,12 +64,6 @@ public class SwerveModule {
         rotateMotor.getPIDController().setD(DriveConstants.ROTATE_PID.d(), 0);
 
         distanceFromRobotCenter = cfg.distanceFromCenter();
-
-        driveMotor.restoreFactoryDefaults();
-        driveMotor.setIdleMode(IdleMode.kBrake);
-
-        rotateMotor.restoreFactoryDefaults();
-        rotateMotor.setIdleMode(IdleMode.kBrake);
     }
 
     public Translation2d getDistanceFromRobotCenter() {
@@ -68,10 +72,12 @@ public class SwerveModule {
 
     public void setTargetState(SwerveModuleState newState) {
         state = newState;
-        rotateMotor.getPIDController().setReference(state.angle.getRotations(), ControlType.kPosition, 0);
-        driveMotor.getPIDController().setReference(state.speedMetersPerSecond / DriveConstants.WHEEL_CIRCUMFERENCE, ControlType.kVelocity, 0);
-        SmartDashboard.putNumber("rotate", state.angle.getRotations());
-        SmartDashboard.putNumber("drive", state.speedMetersPerSecond);
+        rotateMotor.getPIDController().setReference(state.angle.getRotations(), CANSparkBase.ControlType.kPosition, 0);
+        final double driveInput = Rotation2d.fromRadians(state.speedMetersPerSecond / DriveConstants.WHEEL_RADIUS)
+                .getRotations();
+        driveMotor.getPIDController().setReference(driveInput, CANSparkBase.ControlType.kVelocity, 0);
+        SmartDashboard.putNumber(name + ": rotate", state.angle.getRotations());
+        SmartDashboard.putNumber(name + ": drive", driveInput);
     }
 
     public SwerveModuleState getTargetState() {
@@ -79,11 +85,13 @@ public class SwerveModule {
     }
 
     public SwerveModuleState getCurrentState() {
-       return new SwerveModuleState(driveMotor.getEncoder().getVelocity(), new Rotation2d(rotateMotor.getEncoder().getPosition()));
+        return new SwerveModuleState(driveMotor.getEncoder().getVelocity(),
+                new Rotation2d(rotateMotor.getEncoder().getPosition()));
     }
 
     public SwerveModulePosition getPosition() {
-        return new SwerveModulePosition(DriveConstants.WHEEL_CIRCUMFERENCE * driveMotor.getEncoder().getPosition(), new Rotation2d(rotateMotor.getEncoder().getPosition()));
+        return new SwerveModulePosition(DriveConstants.WHEEL_CIRCUMFERENCE * driveMotor.getEncoder().getPosition(),
+                new Rotation2d(rotateMotor.getEncoder().getPosition()));
     }
 
     public void stop() {

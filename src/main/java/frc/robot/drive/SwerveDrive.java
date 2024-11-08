@@ -1,10 +1,6 @@
 package frc.robot.drive;
 
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
-
-import com.ctre.phoenix6.hardware.Pigeon2;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -18,7 +14,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveDrive extends SubsystemBase {
@@ -32,10 +27,10 @@ public class SwerveDrive extends SubsystemBase {
     private Pose2d pose;
 
     public SwerveDrive(Pose2d initialPose) {
-        frontLeft = new SwerveModule(DriveConstants.FRONT_LEFT_SWERVE_CONFIG);
-        frontRight = new SwerveModule(DriveConstants.FRONT_RIGHT_SWERVE_CONFIG);
-        backLeft = new SwerveModule(DriveConstants.BACK_LEFT_SWERVE_CONFIG);
-        backRight = new SwerveModule(DriveConstants.BACK_RIGHT_SWERVE_CONFIG);
+        frontLeft = new SwerveModule(DriveConstants.FRONT_LEFT_SWERVE_CONFIG, "Front Left");
+        frontRight = new SwerveModule(DriveConstants.FRONT_RIGHT_SWERVE_CONFIG, "Front Right");
+        backLeft = new SwerveModule(DriveConstants.BACK_LEFT_SWERVE_CONFIG, "Back Left");
+        backRight = new SwerveModule(DriveConstants.BACK_RIGHT_SWERVE_CONFIG, "Back Right");
         pose = initialPose;
         switch (DriveConstants.GYRO_TYPE) {
             case NavX:
